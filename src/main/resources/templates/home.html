@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CRM Система</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .visible-add-btn {
+            background-color: #198754 !important;
+            color: white !important;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 16px;
+            margin-left: 10px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .visible-add-btn:hover {
+            background-color: #157347 !important;
+            color: white !important;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+    <h1>CRM Система</h1>
+
+    <!-- НАВИГАЦИОННОЕ МЕНЮ -->
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+            <a class="nav-link active" th:href="@{/}">Все Заявки</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" th:href="@{/new-requests}">Новые Заявки</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" th:href="@{/handled-requests}">Обработанные заявки</a>
+        </li>
+        <li class="nav-item ms-auto">
+            <!-- ⭐ ВИДИМАЯ КНОПКА -->
+            <a class="visible-add-btn" th:href="@{/add-request}">+ Добавить заявку</a>
+        </li>
+    </ul>
+
+    <!-- Список заявок -->
+    <div th:each="request : ${requests}" class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title" th:text="${request.userName}"></h5>
+            <p class="card-text">
+                <strong>Курс:</strong>
+                <span th:text="${request.course.name + ' - ' + request.course.price + ' USD'}"></span><br>
+                <strong>Телефон:</strong> <span th:text="${request.phone}"></span><br>
+                <strong>Комментарий:</strong> <span th:text="${request.commentary}"></span><br>
+                <strong>Статус:</strong>
+                <span th:if="${request.handled}" class="badge bg-success">Обработано</span>
+                <span th:unless="${request.handled}" class="badge bg-warning">Новый</span>
+            </p>
+            <div th:if="${not request.handled}">
+                <a th:href="@{/handle-request/{id}(id=${request.id})}" class="btn btn-primary">Обработать заявку</a>
+            </div>
+            <a th:href="@{/request-details/{id}(id=${request.id})}" class="btn btn-info">Детали</a>
+            <form th:action="@{/delete-request/{id}(id=${request.id})}" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Удалить заявку?')">Удалить</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Если заявок нет -->
+    <div th:if="${#lists.isEmpty(requests)}" class="text-center py-5">
+        <h3 class="text-muted">Заявок пока нет</h3>
+        <a th:href="@{/add-request}" class="btn btn-primary btn-lg mt-3">+ Добавить первую заявку</a>
+    </div>
+</div>
+</body>
+</html>

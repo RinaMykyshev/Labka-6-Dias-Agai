@@ -1,5 +1,7 @@
 package com.example.crm_system.controller;
 
+import com.example.crm_system.dto.ApplicationRequestDTO;
+import com.example.crm_system.dto.CourseDTO;
 import com.example.crm_system.entity.ApplicationRequest;
 import com.example.crm_system.entity.Courses;
 import com.example.crm_system.entity.Operator;
@@ -39,26 +41,25 @@ public class MainController {
         return "handled-requests";
     }
 
-    // ⭐⭐⭐ ФУНКЦИЯ ДОБАВЛЕНИЯ НОВОЙ ЗАЯВКИ ⭐⭐⭐
     @GetMapping("/add-request")
     public String addRequestPage(Model model) {
-        model.addAttribute("request", new ApplicationRequest());
+        model.addAttribute("request", new ApplicationRequestDTO());
         model.addAttribute("courses", coursesService.getAllCourses());
         return "add-request";
     }
 
     @PostMapping("/add-request")
-    public String addRequest(@ModelAttribute ApplicationRequest request,
+    public String addRequest(@ModelAttribute ApplicationRequestDTO requestDTO,
                              @RequestParam String courseId) {
-        Courses course = coursesService.getCourseById(courseId);
-        request.setCourse(course);
-        applicationRequestService.addRequest(request);
+        CourseDTO course = coursesService.getCourseById(courseId);
+        requestDTO.setCourse(course);
+        applicationRequestService.addRequest(requestDTO);
         return "redirect:/";
     }
 
     @GetMapping("/handle-request/{id}")
     public String handleRequestPage(@PathVariable String id, Model model) {
-        ApplicationRequest request = applicationRequestService.getRequestById(id);
+        ApplicationRequestDTO request = applicationRequestService.getRequestById(id);
         if (request != null && !request.isHandled()) {
             model.addAttribute("request", request);
             model.addAttribute("operators", operatorService.getAllOperators());
@@ -77,7 +78,7 @@ public class MainController {
 
     @GetMapping("/request-details/{id}")
     public String requestDetails(@PathVariable String id, Model model) {
-        ApplicationRequest request = applicationRequestService.getRequestById(id);
+        ApplicationRequestDTO request = applicationRequestService.getRequestById(id);
         if (request != null) {
             model.addAttribute("request", request);
             return "request-details";

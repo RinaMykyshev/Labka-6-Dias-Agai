@@ -18,7 +18,12 @@
         </div>
     </div>
 
-    <form th:action="@{/assign-operators/{requestId}(requestId=${request.id})}" method="post">
+    <!-- Блок для отображения ошибок -->
+    <div id="errorAlert" class="alert alert-danger d-none" role="alert">
+        Пожалуйста, выберите хотя бы одного оператора!
+    </div>
+
+    <form id="assignForm" th:action="@{/assign-operators/{requestId}(requestId=${request.id})}" method="post">
         <table class="table">
             <thead>
             <tr>
@@ -31,7 +36,7 @@
             <tbody>
             <tr th:each="operator : ${operators}">
                 <td>
-                    <input type="checkbox" name="operatorIds" th:value="${operator.id}">
+                    <input type="checkbox" name="operatorIds" th:value="${operator.id}" class="operator-checkbox">
                 </td>
                 <td th:text="${operator.name}"></td>
                 <td th:text="${operator.surname}"></td>
@@ -41,8 +46,31 @@
         </table>
 
         <button type="button" class="btn btn-secondary" onclick="history.back()">Отмена</button>
-        <button type="submit" class="btn btn-primary">Назначить</button>
+        <button type="submit" class="btn btn-primary" id="submitBtn">Назначить</button>
     </form>
 </div>
+
+<script>
+    document.getElementById('assignForm').addEventListener('submit', function(e) {
+        const checkboxes = document.querySelectorAll('.operator-checkbox:checked');
+        const errorAlert = document.getElementById('errorAlert');
+
+        if (checkboxes.length === 0) {
+            e.preventDefault(); // Останавливаем отправку формы
+            errorAlert.classList.remove('d-none'); // Показываем ошибку
+            errorAlert.scrollIntoView({ behavior: 'smooth' }); // Прокручиваем к ошибке
+        } else {
+            errorAlert.classList.add('d-none'); // Скрываем ошибку если она была показана
+        }
+    });
+
+    // Скрываем ошибку при выборе любого оператора
+    document.querySelectorAll('.operator-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const errorAlert = document.getElementById('errorAlert');
+            errorAlert.classList.add('d-none');
+        });
+    });
+</script>
 </body>
 </html>
